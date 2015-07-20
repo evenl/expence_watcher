@@ -2,8 +2,9 @@ import csv
 from datetime import date
 import sys
 import getopt
+import matplotlib.pyplot as plt
 
-class Month:
+class Month():
 	total_in     = 0
 	total_out    = 0
 	_date        = date(1980, 1, 1)
@@ -23,21 +24,27 @@ class Month:
 	def get_year(self):
 		return self._date.year
 
-class Watch_expences:
-	watch_string           = ""
-	watch_sum              = 0
-	number_of_transactions = 0
-
+class Watch_expences():
 	def __init__(self, string):
+		print "Watching " + string
 		self.watch_string = string
+		self.values                 = []
+		self.number_of_transactions = 0
+		self.watch_sum              = 0
 
 	def check_expence(self, expence_string, value):
 		if expence_string.find(self.watch_string) != -1:
+			print "Adding expence " + str(value) + " to " + self.watch_string
 			self.watch_sum += value
+			self.values.append(value)
 			self.number_of_transactions += 1
 
 	def get_total(self):
 		return self.watch_sum
+
+	def get_values(self):
+		tmp_val = self.values
+		return tmp_val
 
 	def get_average(self):
 		if self.watch_sum != 0:
@@ -63,6 +70,7 @@ def print_help():
 	sys.exit(0)
 
 if __name__ == "__main__": 
+
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], "hs:")
 	except getopt.GetoptError:
@@ -74,7 +82,6 @@ if __name__ == "__main__":
 		if opt == '-h':
 			print_help()
 		elif opt in ("-s"):
-			print "Adding expence watch: " + arg
 			watches.append(Watch_expences(arg))
 
 	with open("transaksjonliste.txt", "rb") as csvfile:
@@ -107,6 +114,9 @@ if __name__ == "__main__":
 	for month in months:
 		print "Total in: " + str(month.total_in) + " total out " + str(month.total_out) + " for month: " + str(month.get_month_name()) + " year: " + str(month.get_year())
 
-
 	for watch in watches:
-		print "Watched expence: " + watch.watch_string + "	total expence: " + str(watch.get_total()) + "	average expence pr month: " + str(watch.get_total() / len(months)) + "	average expence pr number of expences " + str(watch.get_average())
+		plt.plot(watch.get_values())
+		plt.ylabel(watch.watch_string)
+		plt.show()
+
+		print "Expence: " + watch.watch_string + " samples: " + str(len(watch.get_values())) + " Total: " + str(watch.get_total()) + " Avg/month: " + str(watch.get_total() / len(months)) + " Avg/expences: " + str(watch.get_average())
