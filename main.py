@@ -2,6 +2,7 @@ import csv
 from datetime import date
 import sys
 import getopt
+import numpy as np
 import matplotlib.pyplot as plt
 
 class Month():
@@ -115,7 +116,17 @@ if __name__ == "__main__":
 		print "Total in: " + str(month.total_in) + " total out " + str(month.total_out) + " for month: " + str(month.get_month_name()) + " year: " + str(month.get_year())
 
 	for watch in watches:
-		plt.plot(watch.get_values())
+		x = np.arange(1, len(watch.get_values())+1, 1)
+		y = np.array(watch.get_values())
+		y_mean = [np.mean(y) for i in x]
+
+		z = np.polyfit(x, y, 1)
+		p = np.poly1d(z)
+
+		plt.plot(x,p(x),"r--")
+		plt.plot(x, y, 'b-')
+		plt.plot(x, y_mean, "g--")
+
 		plt.ylabel(watch.watch_string)
 		plt.show()
 
